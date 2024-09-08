@@ -1,50 +1,61 @@
-# React + TypeScript + Vite
+# OptiMask
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+OptiMask is a MetaMask-like environment that allows users to interact with the Ethereum blockchain seamlessly. With OptiMask, users can generate a mnemonic seed phrase, create multiple wallets, check their wallet balances, and even send transactions to other addresses.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Mnemonic Generation**: Generate a 12-word mnemonic seed phrase for secure wallet creation.
+- **Multi-Wallet Support**: Create multiple wallets under a single mnemonic, each with its own address and private key.
+- **Balance Checking**: Easily check the balance of each wallet in ETH.
+- **Send Transactions**: Transfer ETH from your wallet to another Ethereum address with ease.
+- **Clean UI**: A clean and responsive interface designed for ease of use.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Frontend**: React, JavaScript
+- **Blockchain Interaction**: ethers.js
+- **API**: Alchemy API for blockchain data
+- **Styling**: CSS
 
-- Configure the top-level `parserOptions` property like this:
+## Installation
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. **Clone the repository**:
+```
+   git clone https://github.com/Fardeen26/OptiMask-Wallet.git
+```
+```
+   cd OptiMask-Wallet
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+2. **Install dependencies**:
 ```
+    npm install
+```
+
+3. **Set up environment variables:**:
+- Create a .env file in the root directory.
+- Add your Alchemy API key to the .env file:
+```
+VITE_ALCHEMY_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/your-api-key
+```
+
+4. **Run the project**:
+```
+npm run dev
+```
+
+## Usage
+1. **Generate a Seed Phrase**: Click the "Generate Seed Phrase" button to create a new mnemonic.
+2. **Create a Wallet**: Use the generated seed phrase to create a new wallet.
+3. **Check Balance**: Select a wallet from the dropdown to view its balance in ETH.
+4. **Send Transactions**: Click "Send" to open the transaction form, enter the recipient's address, and the amount to send.
+
+
+## Future Enhancements
+- **Multi-Chain Support**: Expand the wallet to support multiple blockchain networks.
+- **Transaction History**: Display a list of past transactions for each wallet.
+- **Wallet Import**: Import existing wallets using private keys or JSON files.
+
+## Acknowledgments
+- **ethers.js**: For providing an easy-to-use library for interacting with the Ethereum blockchain.
+- **Alchemy**: For offering a reliable API to access blockchain data.

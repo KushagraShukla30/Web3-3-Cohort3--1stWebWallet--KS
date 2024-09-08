@@ -1,16 +1,18 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
-import { assertPrivate, ethers, HDNodeWallet } from 'ethers'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import NavBar from './components/NavBar';
+import axios from 'axios';
+import PhraseBox from './components/PhraseBox';
+import WalletBox from './components/WalletBox';
+import './App.css';
 
 const App = () => {
-
   const [seedPhrase, setSeedPhrase] = useState('');
   const [wallets, setWallets] = useState([]);
-  const [selectedWalletIndexes, setSelectWallet] = useState({});
+  const [selectedWalletIndex, setSelectedWalletIndex] = useState(0);
+  const [selectedWallet, setSelectedWallet] = useState({});
   const [walletBalance, setWalletBalance] = useState();
-  const [inTransactionForm, SetIstransactionForm] = useState(false);
+  const [isTransactionForm, setIsTransactionForm] = useState(false)
 
   const generateSeedPhrase = () => {
     const mnemonic = ethers.Mnemonic.entropyToPhrase(ethers.randomBytes(16));
@@ -18,48 +20,45 @@ const App = () => {
   };
 
   const createWalletFromSeed = () => {
-    if(!seedPhrase){
-      return;
-    }
+    if (!seedPhrase) return;
     const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase, `m/44'/60'/0'/0/${wallets.length}`);
 
-    const WalletWithID = {
-      id : wallets.length + 1,
+    const walletWithId = {
+      id: wallets.length + 1,
       address: hdNode.address,
-      privateKey : hdNode.privateKey,
-      publicKey : hdNode.publicKey,
-      mnemonic : hdNode.mnemonic.phrase,
-      path : hdNode.path,
-
+      privateKey: hdNode.privateKey,
+      publicKey: hdNode.publicKey,
+      signingKey: hdNode.signingKey,
+      mnemonic: hdNode.mnemonic.phrase,
+      path: hdNode.path,
     };
 
+    setSelectedWallet(hdNode);
+    const newWallets = [...wallets, walletWithId];
+    setWallets(newWallets);
+    setSelectedWalletIndex(newWallets.length - 1);
+    setIsTransactionForm(false)
 
-  setSelectWallet(hdNode);
-  const newWallets = [...wallets, WalletWithID];
-  setWallets(newWallets);
-  setSelectWalletIndex(newWallets.length=1);
-  SetIstransactionForm(false);
-
-
-  fetchBalance(WalletWithID);
+    fetchBalance(walletWithId);
   };
 
-  const handleCharge = (e) => {
+
+  const handleChange = (e) => {
     const selectedIndex = parseInt(e.target.value, 10);
     const selectedWallet = wallets[selectedIndex];
-    setSelectWallet(selectedWallet);
-    setSelectWalletIndex(selectedIndex);
-    SetIstransactionForm(false);
+    setSelectedWallet(selectedWallet);
+    setSelectedWalletIndex(selectedIndex);
+    setIsTransactionForm(false)
   };
 
   const fetchBalance = async (wallet) => {
-    if(wallet){
+    if (wallet) {
       const response = await axios.post(import.meta.env.VITE_ALCHEMY_RPC_URL,
         {
-          "jsonrpc" : "2.0",
+          "jsonrpc": "2.0",
           "id": 1,
-          "method": "eth_getbalance",
-          "params" : [wallet.address, "latest"]
+          "method": "eth_getBalance",
+          "params": [wallet.address, "latest"]
         },
         {
           headers: {
@@ -68,34 +67,35 @@ const App = () => {
         }
       );
 
-      if(response.data){
-        const hexvalue = response.data.result;
-        let decimalValue = BigInt(hexvalue).toString(18);
+      if (response.data) {
+        const hexValue = response.data.result;
+        let decimalValue = BigInt(hexValue).toString(10);
         decimalValue /= 1e18;
-
-        if(decimalValue != 0){
-          const formattedNumber = parseFloat(decimalValue).topFixed(4);
+        if (decimalValue != 0) {
+          const formattedNumber = parseFloat(decimalValue).toFixed(4);
           setWalletBalance(formattedNumber);
-        }
-        else{
+        } else {
           setWalletBalance(decimalValue);
         }
+
+      } else {
+        console.log('Error fetching balance');
       }
-    };
+    }
+  };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (wallets.length > 0) {
+        fetchBalance(selectedWallet);
+      }
+    }, 5000);
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-        if(wallet.length > 0){
-          fetchBalance(selectedWallet);
-        }
-      }, 5000);
+    return () => clearInterval(interval);
+  }, [selectedWallet, wallets.length]);
 
-      return () => clearInterval(interval);
-    }, [selectedWallet, wallets.length]);
-
-    return(
-      <div className="root">
+  return (
+    <div className="root">
       <div className="main">
         <div className="gradient" />
       </div>
@@ -130,5 +130,5 @@ const App = () => {
     </div>
   );
 };
-}
+
 export default App;
